@@ -7,7 +7,7 @@ import os
 #import openai
 from typing import List, Dict, Any
 from loguru import logger
-from streamlit import context
+# from streamlit import context
 from app.config import settings
 from app.config.settings import get_settings
 from azure.ai.inference.models import SystemMessage, UserMessage

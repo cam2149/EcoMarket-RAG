@@ -5,9 +5,13 @@ pydantic
 torch==2.3.0
 torchvision==0.18.0
 transformers==4.38.2
+sentence-transformers
+azure-ai-inference
 pypdf
-langchain_community
+langchain-community
+langchain-openai
 langchain
 azure-storage-blob
 chromadb
 openai
+langgraph 

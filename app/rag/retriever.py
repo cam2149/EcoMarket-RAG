@@ -53,7 +53,7 @@ class DocumentRetriever:
         import os
         from glob import glob
         from pypdf import PdfReader
-        from langchain.text_splitter import RecursiveCharacterTextSplitter
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
         try:
             pdf_folder = docs_folder or os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "docs")
             pdf_files = glob(os.path.join(pdf_folder, "*.pdf"))
@@ -91,7 +91,7 @@ class DocumentRetriever:
         from azure.storage.blob import BlobServiceClient
         from tempfile import TemporaryDirectory
         from pypdf import PdfReader
-        from langchain.text_splitter import RecursiveCharacterTextSplitter
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
         import os
         try:
             blob_service_client = BlobServiceClient.from_connection_string(connection_string)

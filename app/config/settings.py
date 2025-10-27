@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     log_file: Optional[str] = "logs/ecomarket_rag.log"
     
     endpointdataset: str = "https://datasets-server.huggingface.co/rows?dataset=cam2149%2FEcoMarket&config=default&split=train&offset=0&length=100"
+
+    # Orders dataset (populated at app startup)
+    rows_dataset: Optional[list] = None
     
     class Config:
         env_file = ".env"

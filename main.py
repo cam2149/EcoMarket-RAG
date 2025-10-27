@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 from contextlib import asynccontextmanager
 from app.api.apiFast import app
+from langchain_openai import ChatOpenAI
 
 #!/usr/bin/env python3
 """
