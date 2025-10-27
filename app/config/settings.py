@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     azure_openai_endpoint: Optional[str] = Field(None, env="AZURE_OPENAI_ENDPOINT")
     azure_openai_deployment_name: Optional[str] = Field(None, env="AZURE_OPENAI_DEPLOYMENT_NAME")
     azure_openai_api_version: Optional[str] = Field(None, env="AZURE_OPENAI_API_VERSION")
+    
 
     # Pinecone
     pinecone_api_key: Optional[str] = Field(None, env="PINECONE_API_KEY")
@@ -61,6 +62,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
+        extra = "allow"
 
 
 @lru_cache()

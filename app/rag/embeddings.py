@@ -4,9 +4,8 @@ Handles document and query embeddings using sentence transformers
 """
 
 import numpy as np
-from typing import List, Union
+from typing import List
 from sentence_transformers import SentenceTransformer
-import torch.nn.functional as F
 from loguru import logger
 
 
