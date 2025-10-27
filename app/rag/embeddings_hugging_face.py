@@ -38,22 +38,22 @@ class EmbeddingHuggingFaceService:
         Returns:
             Embedding vector as numpy array
         """
-        try:
-            inputs = self.tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
-            with torch.no_grad():
-                outputs = self.model(**inputs)
-                # Use the mean pooling of the last hidden state
-                last_hidden = outputs.last_hidden_state
-                attention_mask = inputs["attention_mask"]
-                mask_expanded = attention_mask.unsqueeze(-1).expand(last_hidden.size()).float()
-                sum_embeddings = torch.sum(last_hidden * mask_expanded, 1)
-                sum_mask = torch.clamp(mask_expanded.sum(1), min=1e-9)
-                embedding = sum_embeddings / sum_mask
-                embedding_np = embedding.squeeze().cpu().numpy()
-            return embedding_np
-        except Exception as e:
-            logger.error(f"Error generating embedding: {str(e)}")
-            raise
+        #try:
+        inputs = self.tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+            # Use the mean pooling of the last hidden state
+            last_hidden = outputs.last_hidden_state
+            attention_mask = inputs["attention_mask"]
+            mask_expanded = attention_mask.unsqueeze(-1).expand(last_hidden.size()).float()
+            sum_embeddings = torch.sum(last_hidden * mask_expanded, 1)
+            sum_mask = torch.clamp(mask_expanded.sum(1), min=1e-9)
+            embedding = sum_embeddings / sum_mask
+            embedding_np = embedding.squeeze().cpu().numpy()
+        return embedding_np
+        #except Exception as e:
+        #    logger.error(f"Error generating embedding: {str(e)}")
+        #    raise
     
     def embed_batch(self, texts: List[str]) -> np.ndarray:
         """
