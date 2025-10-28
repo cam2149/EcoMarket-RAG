@@ -1,83 +1,103 @@
 
-# Documentación Técnica: Módulo `app` - EcoMarket RAG
+
+# Documentación Técnica — Submódulo `app/` de EcoMarket-RAG
 
 ---
 
-## 1. Estructura del Proyecto
+## 1. Estructura del submódulo `app/`
 
 ```
 app/
-├── __init__.py
-├── README.md
-├── config/
-│   └── settings.py
-├── rag/
-│   ├── embeddings_hugging_face.py
-│   ├── embeddings.py
-│   ├── generator.py
-│   ├── prompts.txt
-│   ├── retriever.py
-│   └── __pycache__/
+├── api/           # Endpoints FastAPI, lógica de devoluciones y herramientas para el agente
+├── config/        # settings.py (Pydantic, variables de entorno)
+├── front/         # SPA Gradio y HTML (chat UI)
+├── langchain/     # Orquestación de agentes y herramientas (LangChain/LangGraph)
+├── rag/           # Embeddings, retrieval, generator, prompts
+├── README.md      # Este archivo
+└── __init__.py
 ```
-
-- **config/**: Configuración global y parámetros del sistema.
-- **rag/**: Lógica principal de RAG (embeddings, retrieval, generación, prompts).
-- **README.md**: Documentación técnica y guía de uso del módulo.
 
 ---
 
-## 2. Arquitectura del Chatbot con IA
+## 2. Componentes y responsabilidades
 
-### Diagrama General
+- **api/**
+	- `apiFast.py`: Endpoints REST (pedidos, devoluciones, consulta RAG, health, etc.)
+	- `apiFast_tools.py`: Herramientas BaseTool para integración con agentes LangChain/LangGraph
+	- `devoluciones.py`: Lógica de devoluciones y elegibilidad
 
-```
-Usuario → FastAPI (main.py) → DocumentRetriever → EmbeddingService → Vector Store (ChromaDB/Pinecone) → LLM (OpenAI/Azure/HF) → Respuesta
-```
+- **config/**
+	- `settings.py`: Configuración centralizada vía Pydantic, carga de variables de entorno
 
-### Componentes Clave
+- **front/**
+	- `grad.py`: SPA Gradio (chatbot UI, integración con agente y retrieval)
+	- `index.html`: SPA HTML alternativa (estilos y estructura de chat)
 
-- **DocumentRetriever** (`rag/retriever.py`):
-	- Carga documentos locales y desde Azure Blob Storage.
-	- Realiza chunking y limpieza de texto.
-	- Indexa los chunks en el vector store.
+- **langchain/**
+	- `lang.py`: Orquestación de agentes, integración con herramientas, configuración de tracing LangSmith
 
-- **EmbeddingService** (`rag/embeddings_hugging_face.py`, `embeddings.py`):
-	- Genera embeddings usando modelos de Hugging Face, OpenAI o Azure OpenAI.
-	- Soporta tokenización manual y pooling para mayor control.
-
-- **Generator** (`rag/generator.py`):
-	- Construye prompts y consulta el LLM.
-	- Gestiona la generación de respuestas y manejo de errores.
-
-- **Prompts** (`rag/prompts.txt`):
-	- Plantillas para interacción con el LLM.
-
-- **Config** (`config/settings.py`):
-	- Parámetros de conexión, claves API, rutas y settings generales.
+- **rag/**
+	- `embeddings.py`, `embeddings_hugging_face.py`: Generación de embeddings (HuggingFace, OpenAI, Azure)
+	- `retriever.py`: Recuperación semántica y chunking de documentos
+	- `generator.py`: Generación de respuestas con contexto
+	- `prompts.txt`: Plantillas de prompts para el LLM
 
 ---
 
-## 3. Dependencias Técnicas
+## 3. Flujo de ejecución y arquitectura
 
-- **Principales:**
-	- `langchain`, `chromadb`, `openai`, `transformers`, `torch`, `azure-storage-blob`, `loguru`, `pypdf`
-- **Soporte:**
-	- `pytest`, `pytest-asyncio`, `python-dotenv`
+1. **Ingesta**: Documentos PDF locales o desde Azure Blob Storage → chunking → embeddings → indexación en ChromaDB
+2. **Consulta**: Usuario envía pregunta vía SPA (Gradio) o API REST → embeddings de la consulta → retrieval top-k en ChromaDB → LLM genera respuesta con contexto y citas
+3. **Devoluciones**: Endpoints y lógica para registrar y verificar devoluciones de pedidos
+4. **Observabilidad**: Logs avanzados (Loguru) y tracing opcional con LangSmith
+
+**Diagrama simplificado:**
+```
+Usuario (Gradio/HTML) ──> FastAPI ──> LangChain/LangGraph ──> ChromaDB ──> LLM/Embeddings
+				 ▲                        │
+				 └─────────────<──────────┘
+```
 
 ---
 
-## 4. Guía de Uso
+## 4. Configuración y uso
 
-1. Instala dependencias desde la raíz del proyecto:
+1. Instala dependencias desde la raíz:
 	 ```bash
 	 pip install -r requirements.txt
 	 ```
-2. Configura el archivo `.env` con tus claves y parámetros.
-3. Ejecuta la API desde la raíz:
+2. Configura el archivo `.env` en la raíz con tus credenciales y parámetros (ver README principal).
+3. Ejecuta el sistema desde la raíz:
 	 ```bash
 	 python main.py
 	 ```
-4. Usa los endpoints `/query` para preguntas y `/health` para ver el estado.
+	 - FastAPI: http://localhost:8000/docs
+	 - Gradio: http://localhost:7000
+
+---
+
+## 5. Ejemplo de endpoints y uso
+
+- `GET /health` — Estado del sistema
+- `GET /get_orders_dataset` — Dataset de órdenes
+- `GET /get_order?orden_servicio=...` — Detalles de una orden
+- `POST /query` — Consulta RAG (body: query, top_k, temperature)
+- `POST /register_return_order` — Registrar devolución
+- `POST /verify_eligibility_order` — Verificar elegibilidad de devolución
+
+---
+
+## 6. Notas técnicas
+
+- El submódulo `app/` es autocontenible y puede ser probado de forma aislada usando los tests en `../tests/`.
+- El frontend Gradio puede personalizarse fácilmente editando `front/grad.py` y los estilos de `index.html`.
+- El tracing de agentes (LangSmith) se configura vía variables de entorno y es opcional.
+
+---
+
+## 7. Créditos
+
+Desarrollado para la Maestría en IA Aplicada, Universidad Icesi.
 
 ---
 

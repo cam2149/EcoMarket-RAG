@@ -1,84 +1,128 @@
+
 # EcoMarket-RAG
-# UNIVERSIDAD ICESI
-# MAESTRIA EN  IA APLICADA
-# Trabajo IA Generativa -  Caso de Estudio: Optimización de la Atención al Cliente en una Empresa EcoMarket de E-commerce
-## Nombres:
-#### Carlos Alberto Martinez Ramirez
-#### Wilman Andres Quiñonez Valencia
 
-## Descripción
-EcoMarket-RAG es una solución de Recuperación Aumentada por Generación (RAG) para consultas inteligentes sobre documentación y datos del dominio EcoMarket. Permite a usuarios hacer preguntas en lenguaje natural y obtener respuestas precisas y citables combinando embeddings vectoriales, búsqueda semántica y modelos LLM. Incluye API con FastAPI y procesamiento de documentos PDF locales y desde Azure Blob Storage.
+Solución de Recuperación Aumentada por Generación (RAG) para consultas inteligentes sobre pedidos, devoluciones y documentos en el dominio EcoMarket. Incluye backend FastAPI, frontend SPA (Gradio/HTML), integración con LangChain/LangGraph, ChromaDB, Azure Blob Storage y observabilidad con LangSmith.
 
-## Arquitectura y Diagrama (RAG)
-**Componentes principales:**
-- **FastAPI**: API REST para consultas y gestión de documentos.
-- **LangChain**: Orquestación de pipelines RAG (embeddings, retrievers, prompts, chunking).
-- **ChromaDB**: Vector store local para desarrollo y pruebas.
-- **Azure Blob Storage**: Almacenamiento de documentos fuente (PDF) y datos de ingesta.
+---
+
+## Autores
+- Carlos Alberto Martinez Ramirez
+- Wilman Andres Quiñonez Valencia
+
+---
+
+## Arquitectura General
+
+**Componentes:**
+- **FastAPI**: API REST para consultas, pedidos y devoluciones.
+- **LangChain/LangGraph**: Orquestación de agentes, herramientas y flujos RAG.
+- **ChromaDB**: Vector store local para embeddings y búsqueda semántica.
+- **Azure Blob Storage**: Almacenamiento de PDFs y dataset de órdenes.
 - **OpenAI/Azure OpenAI/Hugging Face**: Modelos LLM y embeddings.
+- **Gradio**: SPA frontend tipo chat.
 - **Loguru**: Logging avanzado.
+- **LangSmith**: Observabilidad y tracing de agentes.
 
-**Flujo RAG:**
-1. **Ingesta**: Documentos PDF locales o desde Azure Blob Storage → chunking → generación de embeddings → indexación en ChromaDB.
-2. **Consulta**: Usuario envía pregunta vía API → embeddings de la consulta → recuperación top-k en ChromaDB → LLM genera respuesta con contexto y citas.
-3. **Observabilidad**: Logs, métricas y trazas de la cadena.
-
-**Diagrama (alto nivel):**
-
-```
-┌─────────────┐         ┌──────────────┐         ┌──────────────┐
-│  SPA Front  │  <--->  │   FastAPI    │  <--->  │  Devoluciones│
-│  (Chat UI)  │  REST   │   Backend    │  lógica │  y JSON Docs │
-└─────────────┘         └─────┬────────┘         └──────┬───────┘
-           │                          │
-           │                          │
-           ▼                          ▼
-         ┌──────────────┐           ┌──────────────┐
-         │   LangChain  │           │ Azure Blob   │
-         │  (RAG Core)  │           │ Storage      │
-         └──────┬───────┘           └──────────────┘
-           │
-           ▼
-         ┌──────────────┐
-         │  ChromaDB    │
-         │ (Vector DB)  │
-         └──────┬───────┘
-           │
-           ▼
-         ┌──────────────┐
-         │  LLM/Embeds  │
-         │(OpenAI/HF/Azure)
-         └──────────────┘
-```
-
-**Flujo resumido:**
-1. Usuario interactúa vía SPA (chat) o API REST.
-2. FastAPI recibe la consulta, valida, gestiona devoluciones y enruta a RAG.
-3. LangChain orquesta: embeddings, retrieval (ChromaDB), contexto y prompt.
+**Flujo principal:**
+1. Usuario interactúa vía SPA (Gradio) o API REST.
+2. FastAPI recibe la consulta, valida, enruta a RAG y gestiona devoluciones.
+3. LangChain/LangGraph orquesta: embeddings, retrieval (ChromaDB), contexto y prompt.
 4. LLM genera respuesta citando fuentes.
 5. Respuesta y estado de devoluciones se retornan al usuario.
 
+**Diagrama:**
+```
+Usuario (SPA/Gradio) ──> FastAPI ──> LangChain/LangGraph ──> ChromaDB ──> LLM/Embeddings
+         ▲                        │
+         └─────────────<──────────┘
+```
+
+---
+
+## Estructura del Proyecto
+
+```
+EcoMarket-RAG/
+├── main.py                # Entry point: lanza FastAPI y Gradio simultáneamente
+├── requirements.txt       # Dependencias
+├── .env                   # Configuración y credenciales
+├── app/
+│   ├── api/               # Endpoints FastAPI y lógica de devoluciones
+│   ├── config/            # settings.py (Pydantic, variables de entorno)
+│   ├── front/             # SPA Gradio y HTML
+│   ├── langchain/         # Orquestación de agentes y herramientas
+│   └── rag/               # Embeddings, retrieval, generator, prompts
+├── tests/                 # Pruebas unitarias
+└── docs/                  # Documentos y dataset
+```
+
+---
+
+## Configuración y Variables de Entorno
+
+1. Copia `.env.example` a `.env` y completa:
+   - Claves de Azure OpenAI, Blob Storage, etc.
+   - Parámetros de LangSmith para tracing (opcional):
+     ```env
+     LANGCHAIN_TRACING_V2=true
+     LANGCHAIN_API_KEY=tu_api_key
+     LANGCHAIN_PROJECT=openai_tracing_ecomarket
+     ```
+2. El archivo `.env` es leído automáticamente por `settings.py`.
+
+---
+
 ## Instalación y Ejecución
 
-### 1. Requisitos previos
-- Python 3.10 o superior
-- Acceso a Azure Blob Storage (si se usa ingesta remota)
-- Claves API de OpenAI/Azure OpenAI (si se usa LLM externo)
+1. Instala dependencias:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Ejecuta el sistema (API y frontend Gradio en paralelo):
+   ```bash
+   python main.py
+   ```
+   - FastAPI: http://localhost:8000/docs
+   - Gradio: http://localhost:7000
 
-### 2. Instalación de dependencias
+---
+
+## Endpoints Principales (FastAPI)
+
+- `GET /health` — Estado del sistema
+- `GET /get_orders_dataset` — Dataset de órdenes
+- `GET /get_order?orden_servicio=...` — Detalles de una orden
+- `POST /query` — Consulta RAG (body: query, top_k, temperature)
+- `POST /register_return_order` — Registrar devolución
+- `POST /verify_eligibility_order` — Verificar elegibilidad de devolución
+
+---
+
+## Frontend SPA (Gradio)
+
+- Interfaz de chat moderna (ver `app/front/grad.py` y `index.html`)
+- Permite consultas naturales, seguimiento de pedidos y devoluciones
+
+---
+
+## Observabilidad y Tracing
+
+- Soporte para LangSmith/LangChain Tracing (configurable vía `.env`)
+- Logs avanzados con Loguru
+
+---
+
+## Pruebas
+
 ```bash
-pip install -r requirements.txt
+pytest tests/
 ```
 
-### 3. Configuración
-1. Copia `.env.example` a `.env` y completa tus credenciales y parámetros.
-2. Configura los datos de Azure Blob Storage si vas a usar ingesta remota.
+---
 
-### 4. Ejecución de la API
-```bash
-python main.py
-```
-La API estará disponible en `http://localhost:8000/docs` (Swagger UI).
+## Créditos
+
+Proyecto académico — Maestría en IA Aplicada, Universidad Icesi
 
 ### 5. Pruebas unitarias
 ```bash
