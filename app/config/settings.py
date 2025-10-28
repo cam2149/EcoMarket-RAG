@@ -10,6 +10,10 @@ from pydantic import Field
 
 
 class Settings(BaseSettings):
+    # LangSmith / LangChain Tracing
+    langchain_tracing_v2: Optional[str] = Field(None, env="LANGCHAIN_TRACING_V2")
+    langchain_api_key: Optional[str] = Field(None, env="LANGCHAIN_API_KEY")
+    langchain_project: Optional[str] = Field(None, env="LANGCHAIN_PROJECT")
     """Application settings"""
     
     # Application

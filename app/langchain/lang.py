@@ -27,17 +27,18 @@ class LangAgent:
     def __init__(self):
         """
         Initializes the class by creating instances of order-related tools and loading all application settings.
-
         Attributes:
             get_order_tool (GetOrderTool): Tool for retrieving order information.
             register_return_order_tool (RegisterReturnOrderTool): Tool for registering return orders.
             verify_eligibility_order_tool (VerifyEligibilityOrderTool): Tool for verifying order eligibility.
             allSettings (dict): Dictionary containing all application settings.
         """
+               
         self.get_order_tool = GetOrderTool()
         self.register_return_order_tool = RegisterReturnOrderTool()
         self.verify_eligibility_order_tool = VerifyEligibilityOrderTool()
         self.allSettings = settings.get_settings()
+        
     
     def load_agent(self): 
         """

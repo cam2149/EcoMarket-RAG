@@ -116,11 +116,14 @@ retriever = DocumentRetriever(embedding_service)
 
 async def get_response(question: str, agent_executor) -> str:
     """
-    Procesa una pregunta del usuario, recupera contexto relevante y obtiene la respuesta del agente.
-    - question: Pregunta del usuario (str)
-    - agent_executor: Agente LangChain/LangGraph
-    Returns: Respuesta generada (str)
+    Asynchronously processes a user's question by retrieving relevant context, constructing a prompt, and invoking an agent to generate a response.
+    Args:
+        question (str): The user's question to be answered.
+        agent_executor: An agent capable of processing the constructed prompt and returning a response.
+    Returns:
+        str: The agent's answer to the question, or an error message if the input is invalid or processing fails.
     """
+
     if not question or not question.strip():
         return "Por favor ingresa una pregunta válida."
     else:
@@ -182,10 +185,10 @@ def create_chat_interface(agent_executor):
             history.append({"role": "assistant", "content": error_msg})
             return history
 
-    with gr.Blocks(title="EcoMarket RAG Chat", css=custom_css) as demo:
+    with gr.Blocks(theme=gr.themes.Default(primary_hue=gr.themes.colors.green, secondary_hue=gr.themes.colors.lime),title="EcoMarket RAG Chat", css=custom_css) as demo:
         gr.Markdown(
             """
-            # 🤖 EcoMarket RAG Chat
+            # EcoMarket RAG Chat
             Bienvenido al asistente virtual de EcoMarket.
             Puedo ayudarte con:
             - Información de pedidos

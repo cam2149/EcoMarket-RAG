@@ -21,6 +21,7 @@ class GetOrderTool(BaseTool):
     def _run(self, orden_servicio: str) -> dict:
         import re
         from app.config.settings import get_settings
+        from app.api.devoluciones import DevolutionsGenerator
         settings = get_settings()
         rows = settings.rows_dataset or []
         if not orden_servicio or not re.match(r"^[A-Z]{3}-\d{4}-\d{5}$", orden_servicio):
@@ -28,6 +29,10 @@ class GetOrderTool(BaseTool):
         order = next((row['row'] for row in rows if row['row']['order_id'] == orden_servicio), None)
         if not order:
             return {"error": f"No se encontró la orden de servicio: {orden_servicio}"}
+
+        devolucion = DevolutionsGenerator().buscar_devolucion(orden_servicio)
+        if devolucion:
+            return {"error": f"La orden de servicio {orden_servicio} tiene una devolución registrada."}
         return order
 
     async def _arun(self, orden_servicio: str) -> dict:
@@ -56,8 +61,8 @@ class RegisterReturnOrderTool(BaseTool):
     def _run(self, codigo_devolucion: str) -> dict:
         from app.api.apiFast import devolutions
         try:
-            devolutions.registrar_devolucion_en_json(codigo_devolucion)
-            return {"success": True, "message": f"Devolución registrada: {codigo_devolucion}"}
+            result: str = devolutions.registrar_devolucion(codigo_devolucion)
+            return {"success": True, "message": f"Devolución registrada: {result}"}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
