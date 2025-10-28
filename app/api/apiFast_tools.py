@@ -79,8 +79,18 @@ class VerifyEligibilityOrderTool(BaseTool):
         order = next((row['row'] for row in rows if row['row']['order_id'] == orden_servicio), None)
         if not order:
             return {"elegible": False, "motivo": "Orden de servicio no encontrada."}
-        elegible, motivo = devolutions.is_eligible_for_return(order)
-        return {"elegible": elegible, "motivo": motivo}
+        
+        # Regla 5: Productos no elegibles por tipo
+        tipo = order.get("category", "").lower()
+        if any(palabra in tipo for palabra in ["higiene", "cosméticos", "alimentos", "bebidas"]):
+            return {"elegible": False, "motivo": "Productos de higiene personal, cosméticos, alimentos o bebidas no pueden ser devueltos."}
+        # Regla 6: Status debe ser 'Entregado'
+        status = order.get("status", "")
+        if status.strip().lower() != "entregado":
+            return {"elegible": False, "motivo": "Solo productos con status 'Entregado' pueden ser devueltos."}
+        return {"elegible": True, "motivo": "Elegible para devolución."}
+
+       
 
     async def _arun(self, orden_servicio: str) -> dict:
         raise NotImplementedError("Async not implemented")
