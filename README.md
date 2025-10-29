@@ -47,7 +47,7 @@ EcoMarket-RAG/
 ├── requirements.txt       # Dependencias
 ├── .env                   # Configuración y credenciales
 ├── app/
-│   ├── api/               # Endpoints FastAPI y lógica de devoluciones
+│   ├── api/               # Endpoints FastAPI, Tools LangChain y lógica de devoluciones
 │   ├── config/            # settings.py (Pydantic, variables de entorno)
 │   ├── front/             # SPA Gradio y HTML
 │   ├── langchain/         # Orquestación de agentes y herramientas
