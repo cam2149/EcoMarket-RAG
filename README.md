@@ -133,6 +133,8 @@ pytest
 - **Lenguaje:** Python 3.10+
 - **API:** FastAPI
 - **Orquestación RAG:** LangChain
+- **Frontend:** Gradio (SPA)
+- **Monitoreo:** LangSmith (opcional)
 - **Vector DB:** ChromaDB (local)
 - **Almacenamiento:** Azure Blob Storage (opcional)
 - **LLMs/Embeddings:** OpenAI, Azure OpenAI, Hugging Face Transformers
@@ -144,14 +146,26 @@ pytest
 - uvicorn
 - loguru
 - pydantic
-- torch
-- torchvision
-- transformers
+- torch==2.3.0
+- torchvision==0.18.0
+- transformers==4.38.2
+- sentence-transformers
+- azure-ai-inference
 - pypdf
-- langchain
-- langchain_community
 - azure-storage-blob
-- python-dotenv
+- chromadb
+- openai
+- langsmith
+- langchain>=0.3
+- langchain-core>=0.3.78,<1.0.0
+- langchain-community>=0.3
+- langchain-openai>=0.3.35
+- langchain-text-splitters>=0.3.11
+- langgraph>=1.0.0
+- langgraph-checkpoint>=3.0.0
+- langgraph-prebuilt>=1.0.0
+- pydantic>=2
+- gradio
 
 ### Dependencias de soporte (testing y logging)
 - pytest
