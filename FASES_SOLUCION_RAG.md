@@ -64,6 +64,10 @@ El proceso automatizado que seguirá el agente se estructura en **fases secuenci
 7. [Diseño, Planificación del Flujo del Trabajo del Agente ](https://drive.google.com/file/d/1C4kVMZ1J6v6_hx2p-3t_AOrTEvX9S9bl/view?usp=sharing)
 
 
+<p align="center">
+   <img src="https://github.com/cam2149/EcoMarket-RAG/blob/development/docs/Flujo_RAG.jpg" alt="Flujo de Trabajo del Agente RAG" style="max-width:500px; width:100%;">
+</p>
+
 -------
 
 
