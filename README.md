@@ -32,7 +32,7 @@ Solución de Recuperación Aumentada por Generación (RAG) para consultas inteli
 
 **Diagrama:**
 ```
-Usuario (SPA/Gradio) ──> FastAPI ──> LangChain/LangGraph ──> ChromaDB ──> LLM/Embeddings
+Usuario [(SPA/Gradio) ── FastAPI] ──> LangChain/LangGraph ──> ChromaDB ──> LLM/Embeddings
          ▲                        │
          └─────────────<──────────┘
 ```
