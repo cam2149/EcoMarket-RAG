@@ -12,7 +12,7 @@ Las herramientas representan las funciones que permiten al agente ejecutar accio
 | **Herramienta** | **Descripción** | **Entrada (Input)** | **Salida (Output)** | **Propósito principal** |
 |------------------|-----------------|----------------------|----------------------|---------------------------|
 | `get_order_tool` | Recupera la información detallada de una orden específica. | ID de la orden. | Información detallada de la orden (productos, valor total, estado, cliente). | Permite al agente consultar detalles de una orden puntual. |
-| `register_return_order` | Registra una nueva orden de devolución en el sistema. | ID de la orden y motivo de devolución. | Confirmación de registro y número de caso. | Automatiza el proceso de devoluciones, generando trazabilidad en el sistema. | Generación de etiqueta |
+| `register_return_order` | Registra una nueva orden de devolución en el sistema. | ID de la orden. | Confirmación de registro y número de caso. | Automatiza el proceso de devoluciones, generando trazabilidad en el sistema. | Generación de etiqueta |
 | `verify_eligibility_order_tool` | Verifica si un producto cumple con las políticas de devolución de EcoMarket. | ID de la orden. | Estado de elegibilidad (aprobado o rechazado) y motivo. | Evalúa si la orden cumple las condiciones para proceder con la devolución. |
 
 
@@ -50,13 +50,13 @@ El proceso automatizado que seguirá el agente se estructura en **fases secuenci
    Mediante el módulo RAG, para traer las condiciones vigentes según el tipo de producto.
 
 4. **Verificación de elegibilidad:**
-   Con la información de la orden y la política, el agente ejecuta  `verify_eligibility_order_tool`.
+   Con la información de la orden y la política, el agente ejecuta  `verify_eligibility_order`.
 
    * Si **no cumple** los criterios, el agente explica el motivo al cliente citando la política.
    * Si **cumple**, continúa al siguiente paso.
 
 5. **Generación de etiqueta:**
-   Se llama a `register_return_order` para crear la guía de envío y registrar el proceso.
+   Se llama a `register_return_order` para crear la etiqueta de devolución y registrar el proceso.
 
 6. **Notificación y cierre:**
    El agente comunica al usuario el resultado del proceso de devolución y finaliza la conversación si no se recibe una nueva solicitud o requerimiento relacionado con otra devolución.
@@ -111,6 +111,7 @@ Esta fase consolidó la **interconexión entre los módulos principales**:
 | **SAP Front (SPA)**                   | Interfaz donde el usuario realiza la solicitud de devolución.                      |
 | **API REST / FastAPI Backend**        | Recibe la solicitud, valida datos, ejecuta herramientas y coordina el flujo.       |
 | **LangChain (Orquestación)**          | Controla el flujo de decisiones del agente y la interacción con las herramientas.  |
+| **LangSmith (Monitoreo)**              | Brinda una visibilidad completa del comportamiento de los agentes con seguimiento, monitoreo en tiempo real, alertas e información de alto nivel sobre el uso.  |
 | **ChromaDB (Retrieval)**              | Base vectorial que almacena las políticas de devolución y contexto relevante.      |
 | **LLM / Embeddings (OpenAI - Azure)** | Motor de razonamiento que interpreta la consulta y genera la respuesta contextual. |
 
@@ -122,8 +123,8 @@ Esta fase consolidó la **interconexión entre los módulos principales**:
 -------
 
 # Fase 3 🧩 Análisis Crítico y Propuestas de Mejora
-**Caso:** Agente de IA para devoluciones de productos y generación de etiquetas (RAG + LLM + FastAPI)
-
+**Caso:** Agente de IA para que opera como asistente de servicio al cliente para dar información sobre pedidos, políticas de la tienda, gestión de devoluciones de productos y generación de etiquetas de devolución (RAG + LLM + FastAPI)
+ 
 ---
 
 ## 🧩 Análisis de Seguridad y Ética
@@ -136,7 +137,7 @@ Cuando un agente de IA con arquitectura RAG (Retrieval-Augmented Generation) y m
 
 2. **Fuga de información (PII).**  
    El contexto recuperado por el RAG podría incluir información sensible de la devolución.  
-   **Solución:** anonimizar datos antes de ser procesados por el LLM y aplicar enmascaramiento en los logs de FastAPI.
+   **Solución:** anonimizar datos antes de ser procesados por el LLM y aplicar enmascaramiento en los logs de FastAPI, asegurando cumplimiento con GDPR y normativas locales, se preparan el prompt base para que solo responda con información no sensible.
 
 3. **Alucinación de políticas o decisiones.**  
    El modelo podría citar reglas inexistentes o modificar las condiciones reales de devolución.  
@@ -158,10 +159,11 @@ La operación confiable de un agente autónomo requiere **observabilidad integra
 
 1. **Registro estructurado de acciones.**  
    Cada paso —consulta, verificación, generación de etiqueta— debe registrarse con `trace_id` y `span_id`.  
-   **Solución:** implementar OpenTelemetry y almacenar trazas estructuradas (JSON) con métricas como latencia, éxito y tokens usados.
+   **Solución:** implementar OpenTelemetry y almacenar trazas estructuradas (JSON) con métricas como latencia, éxito y tokens usados, para efectos del 
+   ejercicio académico se usó LangSmith como plataforma de tracing y monitoreo.
 
 2. **Panel de control (Grafana / Prometheus).**  
-   Permite observar m茅tricas de desempe帽o y alertar desviaciones.  
+   Permite observar métricas de desempeño y alertar desviaciones.  
    - `label_issue_success_rate` 🔖 porcentaje de etiquetas generadas con éxito.  
    - `policy_block_rate` 🔒 acciones bloqueadas por reglas.  
    - `llm_latency_ms` ⏱️ tiempo de respuesta del modelo.  
@@ -205,20 +207,15 @@ El agente actual puede evolucionar hacia un ecosistema de **agentes colaborativo
 
 ## 🧩 Conclusión
 
-El análisis crítico revela que un agente RAG con FastAPI puede operar con autonomía y seguridad siempre que se apliquen controles éticos, técnicos y de observabilidad.  
-Las mejoras propuestas fortalecen su fiabilidad y escalabilidad, permitiendo que EcoMarket evolucione hacia un sistema de **atención inteligente**, trazable y centrado en la confianza del cliente.
+Las propuestas a escada de POC, permite que una tienda como EcoMarket evolucione hacia un sistema de **atención inteligente**, trazable y centrado en la confianza del cliente.
 
-Aquí tienes la justificación de forma breve, clara y profesional, con dos párrafos y una tabla comparativa, todo en formato **Markdown**:
-
----
-
-Perfecto 💪 Aquí tienes la versión actualizada en **Markdown**, integrando el contexto de **EcoMarket** de forma natural, profesional y coherente:
+Un agente con la arquitectura seleccionada Usuario [(Gradio/HTML) - FastAPI] ──> LangChain/LangGraph ──> ChromaDB ──> LLM/Embeddings puede operar con autonomía y seguridad siempre que se apliquen controles éticos, técnicos y de observabilidad necesarios para entornos de evaluación de la tecnología más no para ambientes productivos.
 
 ---
 
 ## 🧩 Fase 4: Despliegue de la Aplicación
 
-Durante la fase de despliegue del proyecto **EcoMarket - Agente RAG para devoluciones**, se optó por utilizar **Gradio** como herramienta principal para la construcción de la interfaz del sistema. Esta elección se basó en su **simplicidad, rapidez de implementación y compatibilidad directa con modelos conversacionales**, lo que permite crear interfaces funcionales en pocos minutos sin requerir una estructura compleja. Gradio proporciona componentes nativos para chat, carga de archivos y botones interactivos, lo que facilita la comunicación entre el usuario y el backend desarrollado en **FastAPI**, optimizando el flujo entre la solicitud del cliente, la verificación de elegibilidad y la generación de etiquetas de devolución dentro del entorno de **EcoMarket**.
+Durante la fase de despliegue del proyecto **EcoMarket - Agente RAG para devoluciones**, se optó por utilizar **Gradio** como herramienta principal para la construcción de la interfaz del sistema. Esta elección se basó en su **simplicidad, rapidez de implementación y compatibilidad directa con modelos conversacionales**, lo que permite crear interfaces funcionales en pocos minutos sin requerir una estructura compleja. Gradio proporciona componentes nativos para chat, carga de archivos y botones interactivos, lo que facilita la comunicación entre el usuario y el backend desarrollado, optimizando el flujo entre la solicitud del cliente, la verificación de elegibilidad y la generación de etiquetas de devolución dentro del entorno de **EcoMarket**.
 
 Por su parte, **Streamlit**, aunque es una herramienta muy potente para el desarrollo de **dashboards y aplicaciones de análisis de datos**, no resulta tan eficiente para un caso de uso centrado en la **interacción conversacional y las respuestas en tiempo real**. Su configuración requiere un mayor manejo de sesiones, control de estados y estructura de interfaz, lo que incrementa la complejidad y el tiempo de desarrollo sin aportar beneficios relevantes para un agente conversacional como el de **EcoMarket**, cuyo objetivo principal es ofrecer respuestas rápidas, claras y automatizadas a las solicitudes de devolución.
 
@@ -233,17 +230,11 @@ Por su parte, **Streamlit**, aunque es una herramienta muy potente para el desar
 | **Componentes de chat**     | Nativos y optimizados (`ChatInterface`, `Textbox`)   | Requiere personalización manual con `st.chat_*`       |
 | **Integración con FastAPI** | Simple con `requests` o endpoints directos           | Similar, pero con más configuración de estado         |
 | **Despliegue**              | Rápido (Hugging Face Spaces, Gradio Cloud, Docker)   | Más orientado a Streamlit Cloud o servidores propios  |
-| **Adecuado para EcoMarket** | ✅ Ideal para el flujo conversacional de devoluciones | ❌ Excesivo para un caso no analítico                  |
+| **Adecuado para EcoMarket** | ✅ Ideal para el flujo conversacional simples        | ❌ Excesivo para un caso no analítico                  |
 
 ---
 
 > 🧩 En conclusión, **Gradio** fue la herramienta más adecuada para **EcoMarket**, ya que equilibra **rapidez, funcionalidad y facilidad de integración** con el backend del agente RAG. Esto permitió desplegar una interfaz ágil, moderna y centrada en la experiencia del usuario, fortaleciendo la eficiencia y trazabilidad del proceso de devoluciones.
-
-
-
-
-
-
 
 ---
 
