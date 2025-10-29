@@ -1,7 +1,7 @@
 
 # EcoMarket-RAG
 
-Solución de Recuperación Aumentada por Generación (RAG) para consultas inteligentes sobre pedidos, devoluciones y documentos en el dominio EcoMarket. Incluye backend FastAPI, frontend SPA (Gradio/HTML), integración con LangChain/LangGraph, ChromaDB, Azure Blob Storage y observabilidad con LangSmith.
+Solución de Recuperación Aumentada por Generación (RAG) para consultas inteligentes sobre pedidos, devoluciones y documentos en el dominio EcoMarket. Incluye backend FastAPI, frontend SPA (Gradio/HTML), integración con LangChain, ChromaDB, Azure Blob Storage y observabilidad con LangSmith.
 
 ---
 
