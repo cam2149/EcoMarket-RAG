@@ -209,7 +209,7 @@ El agente actual puede evolucionar hacia un ecosistema de **agentes colaborativo
 
 Las propuestas a escala de POC, permite que una tienda como EcoMarket evolucione hacia un sistema de **atención inteligente**, trazable y centrado en la confianza del cliente.
 
-Un agente con la arquitectura seleccionada Usuario [(Gradio/HTML) - FastAPI] ──> LangChain/LangGraph ──> ChromaDB ──> LLM/Embeddings puede operar con autonomía y seguridad siempre que se apliquen controles éticos, técnicos y de observabilidad necesarios para entornos de evaluación de la tecnología más no para ambientes productivos.
+Un agente con la arquitectura seleccionada Usuario [(Gradio/HTML) - FastAPI] ──> LangChain/LangGraph ──> ChromaDB ──> LLM/Embeddings puede operar con autonomía y seguridad siempre que se apliquen controles éticos, técnicos y de observabilidad estrictos necesarios para entornos de evaluación de la tecnología más no para ambientes productivos.
 
 ---
 
